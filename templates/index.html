@@ -11,7 +11,6 @@
         body, html { height: 100%; margin: 0; background: #f0f4f8; font-family: 'Segoe UI', Roboto, sans-serif; }
         .main-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
         
-        /* Ajuste para que el contenedor permita elementos flotantes externos */
         .card-custom { 
             width: 100%; 
             max-width: 1000px;
@@ -32,7 +31,6 @@
         
         .legal-text { font-size: 0.75rem; color: #6c757d; line-height: 1.4; background: #f8f9fa; padding: 15px; border-radius: 12px; }
 
-        /* Estructura de la Dimensión */
         .contenedor-dimension {
             display: flex;
             align-items: flex-start;
@@ -44,61 +42,54 @@
             width: 100%;
         }
 
-        /* Guía de Calificación Sticky */
         .columna-guia-sticky {
             width: 280px;
             position: -webkit-sticky;
             position: sticky;
             top: 20px; 
             z-index: 1000;
-            /* Estos márgenes "sacan" el cuadro del flujo de la card */
             margin-right: -320px; 
             margin-left: 40px;
             height: fit-content;
         }
 
-        /* Ajuste de la columna del gráfico para que no se vea gigante pero sí amplio */
         @media (min-width: 1100px) {
             .col-lg-7 {
                 flex: 0 0 auto;
-                width: 60%; /* Le damos un poco más de peso al gráfico */
+                width: 60%;
             }
             .col-lg-5 {
                 flex: 0 0 auto;
                 width: 40%;
             }
         }
-
-        /* Mantenemos el ajuste para tablets */
+        
+        /* Ajustes para Tablets y Móviles */
         @media (max-width: 1100px) {
-            .card-custom { max-width: 850px; }
-            .contenedor-dimension { flex-direction: column; }
-            .columna-guia-sticky { 
-                width: 100%; 
-                position: static; 
-                margin: 0 0 20px 0;
-            }
-        }
-
-        /* Móviles */
-        @media (max-width: 1100px) {
-            .card-custom { max-width: 850px; }
+            .card-custom { max-width: 100% !important; border-radius: 0; }
             
-            /* Cambiamos el orden aquí */
             .contenedor-dimension { 
-                flex-direction: column; 
-                display: flex; /* Asegura que se comporte como flex */
+                display: flex !important;
+                flex-direction: column !important; 
             }
             
             .columna-guia-sticky { 
-                width: 100%; 
-                position: static; 
-                margin: 0 0 20px 0;
-                order: -1; /* <--- ESTO hará que suba al primer lugar en móvil */
+                width: 100% !important; 
+                position: relative !important; 
+                top: 0 !important;
+                margin: 0 0 25px 0 !important; 
+                order: -1 !important; 
             }
         
             .columna-preguntas {
-                order: 1; /* Esto asegura que las preguntas vayan después */
+                width: 100% !important;
+                order: 1 !important;
+            }
+        
+            .columna-guia-sticky .p-4 {
+                margin-right: 0 !important;
+                border-start: none !important;
+                border-top: 4px solid #0d6efd !important; /
             }
         }
          
@@ -117,7 +108,6 @@
     </style>
 </head>
 <body>
-
     <div class="main-container">
         <div class="card-custom animate__animated animate__fadeIn">
             
