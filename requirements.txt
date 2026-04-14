@@ -1,4 +1,4 @@
 flask
-supabase
+psycopg2-binary
 gunicorn
 python-dotenv
