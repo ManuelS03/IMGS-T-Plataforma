@@ -3,47 +3,86 @@ const IMGS_Wizard = {
     totalSteps: 0,
 
     init: function(total) {
-        this.totalSteps = total;
+        this.totalSteps = total + 1; 
         this.showStep(0);
         this.updateProgress();
     },
 
     showStep: function(stepIndex) {
         document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
-        const nextStep = document.getElementById(`step${stepIndex}`);
+        
+        const id = (stepIndex === '_intro') ? 'step_intro' : `step${stepIndex}`;
+        const nextStep = document.getElementById(id);
+        
         if (nextStep) {
             nextStep.classList.add('active');
-            this.currentStep = stepIndex;
+            
+            if (stepIndex === '_intro') {
+                this.currentStep = 0.5; 
+            } else {
+                this.currentStep = stepIndex;
+            }
+            
             window.scrollTo(0, 0);
+            this.updateProgress();
         }
     },
 
     goToStep: function(stepIndex) {
-        
         if (stepIndex > this.currentStep) {
+            
             if (this.currentStep === 0) {
                 const nombre = document.querySelector('input[name="nombre_empresa"]').value;
+                const nit = document.querySelector('input[name="nit"]').value;
+                const ciudad = document.querySelector('select[name="ciudad"]').value;
+                const tamano = document.querySelector('select[name="tamano"]').value;
+
                 if (!nombre.trim()) {
                     alert("Por favor, ingresa el nombre de la organización.");
                     return;
                 }
-            } else {
 
-                const currentStepDiv = document.getElementById(`step${this.currentStep}`);
-                const radios = currentStepDiv.querySelectorAll('input[type="radio"]');
-                const names = new Set();
-                radios.forEach(r => names.add(r.name));
+                const soloNumeros = /^\d+$/;
+                if (!nit.trim()) {
+                    alert("Por favor, ingresa el NIT.");
+                    return;
+                } else if (!soloNumeros.test(nit)) {
+                    alert("El NIT solo debe contener números (sin puntos, guiones ni letras).");
+                    return;
+                }
+
+                if (!ciudad) {
+                    alert("Por favor, selecciona una ciudad.");
+                    return;
+                }
+
+                if (!tamano) {
+                    alert("Por favor, selecciona el tamaño de la empresa.");
+                    return;
+                }
                 
-                for (let name of names) {
-                    if (!currentStepDiv.querySelector(`input[name="${name}"]:checked`)) {
-                        alert("Por favor, responda todas las preguntas antes de continuar.");
-                        return;
+                this.showStep('_intro');
+                return;
+            } 
+            
+            else if (this.currentStep >= 1) {
+                const currentStepDiv = document.getElementById(`step${this.currentStep}`);
+                if (currentStepDiv) {
+                    const radios = currentStepDiv.querySelectorAll('input[type="radio"]');
+                    const names = new Set();
+                    radios.forEach(r => names.add(r.name));
+                    
+                    for (let name of names) {
+                        if (!currentStepDiv.querySelector(`input[name="${name}"]:checked`)) {
+                            alert("Por favor, responda todas las preguntas antes de continuar.");
+                            return;
+                        }
                     }
                 }
             }
         }
+        
         this.showStep(stepIndex);
-        this.updateProgress();
     },
 
     updateProgress: function() {
@@ -52,6 +91,10 @@ const IMGS_Wizard = {
             const percent = (this.currentStep / this.totalSteps) * 100;
             bar.style.width = percent + '%';
         }
+    },
+
+    startAssessment: function() {
+        this.showStep(1);
     }
 };
 
@@ -87,11 +130,8 @@ function renderResultChart(labels, scores) {
                         stepSize: 1,
                         backdropColor: 'transparent'
                     },
-                    
                     pointLabels: {
-                        font: {
-                            size: 11
-                        },
+                        font: { size: 11 },
                         callback: function(label) {
                             if (label.length > 10) {
                                 return label.split(' '); 
@@ -102,9 +142,7 @@ function renderResultChart(labels, scores) {
                 }
             },
             plugins: {
-                legend: {
-                    display: false
-                }
+                legend: { display: false }
             }
         }
     });
