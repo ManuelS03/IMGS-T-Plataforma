@@ -1,11 +1,10 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 import os
 from dotenv import load_dotenv
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
 app = Flask(__name__)
-
 load_dotenv()
 
 DB_CONFIG = {
@@ -30,16 +29,27 @@ def index():
     pregs = cur.fetchall()
     cur.close()
     conn.close()
+    # Obtenemos resultado de los argumentos de la URL si venimos de una redirección
+    resultado = request.args.get('resultado') 
     return render_template('index.html', dimensiones=dims, preguntas=pregs, resultado=None)
 
 @app.route('/evaluar', methods=['POST'])
 def evaluar():
     nombre_empresa = request.form.get('nombre_empresa')
+    nit = request.form.get('nit')
+    ciudad = request.form.get('ciudad')
+    tamano = request.form.get('tamano')
+
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
     try:
-        cur.execute("INSERT INTO empresas (nombre_empresa) VALUES (%s) RETURNING id", (nombre_empresa,))
+        # 1. Insertar Empresa (Asegúrate que las columnas nit, ciudad, tamano existan en la DB)
+        cur.execute("""
+            INSERT INTO empresas (nombre_empresa, nit, ciudad, tamano) 
+            VALUES (%s, %s, %s, %s) RETURNING id
+        """, (nombre_empresa, nit, ciudad, tamano))
+        
         empresa_id = cur.fetchone()['id']
 
         cur.execute("SELECT id, nombre FROM dimensiones ORDER BY id")
@@ -59,62 +69,72 @@ def evaluar():
                 puntos_dim[p['dimension_id']]['suma'] += valor_int
                 puntos_dim[p['dimension_id']]['max'] += 4
 
-        # Cálculo de puntajes normalizados
+        def obtener_nivel_texto(p):
+            if p <= 1.0: return "Nivel 1: Reactivo"
+            if p <= 2.0: return "Nivel 2: Inicial"
+            if p <= 3.0: return "Nivel 3: Estructurado"
+            if p <= 4.0: return "Nivel 4: Integrado"
+            return "Nivel 5: Estratégico"
+
         labels, scores = [], []
         for d_id, data in puntos_dim.items():
-            score = (data['suma'] / data['max'] * 5) if data['max'] > 0 else 0
-            labels.append(data['nombre'])
-            scores.append(round(score, 2))
+            promedio_norm = round((data['suma'] / data['max'] * 5), 2) if data['max'] > 0 else 0
+            nivel_dim = obtener_nivel_texto(promedio_norm)
+            
+            cur.execute("""
+                INSERT INTO resultados_dimensiones (empresa_id, dimension_id, promedio, nivel_madurez)
+                VALUES (%s, %s, %s, %s)
+            """, (empresa_id, d_id, promedio_norm, nivel_dim))
 
-        global_score = round(sum(scores) / 5, 2)
-        
-        # ACTUALIZACIÓN: Guardamos el puntaje final para que el chatbot lo use
+            labels.append(data['nombre'])
+            scores.append(promedio_norm)
+
+        global_score = round(sum(scores) / len(scores), 2) if scores else 0
         cur.execute("UPDATE empresas SET resultado_total = %s WHERE id = %s", (global_score, empresa_id))
 
-        # GUARDADO FINAL
-        conn.commit()
+        # ¡MUY IMPORTANTE!
+        conn.commit() 
 
-        # Clasificación
-        if global_score <= 1: nivel = "Nivel 1: Reactivo"
-        elif global_score <= 2: nivel = "Nivel 2: Inicial"
-        elif global_score <= 3: nivel = "Nivel 3: Estructurado"
-        elif global_score <= 4: nivel = "Nivel 4: Integrado"
-        else: nivel = "Nivel 5: Estratégico"
-
+        nivel_global = obtener_nivel_texto(global_score)
         resultado = {
             'empresa_id': empresa_id,
             'empresa': nombre_empresa, 
             'score': global_score, 
-            'nivel': nivel, 
+            'nivel': nivel_global, 
             'labels': labels, 
             'scores': scores
         }
+        
+        # En lugar de solo renderizar, lo ideal es pasar el objeto resultado
+        return render_template('index.html', resultado=resultado)
 
     except Exception as e:
-        conn.rollback()
-        return f"Error al guardar: {e}"
+        if conn: conn.rollback()
+        print(f"Error detectado: {e}") # Esto aparecerá en tu terminal
+        return f"Error al guardar: {e}", 500
     finally:
-        cur.close()
-        conn.close()
+        if cur: cur.close()
+        if conn: conn.close()
 
-    return render_template('index.html', resultado=resultado)
-
-# Ruta para comentarios (Asegúrate de tenerla si ya la implementaste en el JS)
 @app.route('/guardar_comentario', methods=['POST'])
 def guardar_comentario():
     data = request.get_json()
     empresa_id = data.get('empresa_id')
     comentario = data.get('comentario')
+    conn = None
     try:
         conn = get_db_connection()
         cur = conn.cursor()
+        # Aseguramos que pasamos los parámetros correctamente
         cur.execute("UPDATE empresas SET comentario_general = %s WHERE id = %s", (comentario, empresa_id))
         conn.commit()
-        cur.close()
-        conn.close()
         return jsonify({"status": "success"})
     except Exception as e:
+        if conn: conn.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if conn:
+            conn.close()
 
 if __name__ == '__main__':
     app.run(debug=True)
