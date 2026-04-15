@@ -63,7 +63,7 @@
                 width: 40%;
             }
         }
-        
+
         /* Ajustes para Tablets y Móviles */
         @media (max-width: 1100px) {
             .card-custom { max-width: 100% !important; border-radius: 0; }
@@ -108,6 +108,7 @@
     </style>
 </head>
 <body>
+
     <div class="main-container">
         <div class="card-custom animate__animated animate__fadeIn">
             
@@ -128,21 +129,110 @@
                             <p class="text-muted">Sector Textil Colombiano</p>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Nombre de la Organización:</label>
-                            <input type="text" name="nombre_empresa" class="form-control form-control-lg border-2" required placeholder="Ej: Textiles Bogotá">
+                        <div class="row g-3 mb-4 text-start">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Nombre de la Organización:</label>
+                                <input type="text" name="nombre_empresa" class="form-control form-control-lg border-2" required placeholder="Ej: Textiles Bogotá">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">NIT:</label>
+                                <input type="text" name="nit" class="form-control border-2" required 
+                                    placeholder="Solo números" 
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Ciudad / Municipio:</label>
+                                <select name="ciudad" class="form-select border-2" required>
+                                    <option value="" selected disabled>Seleccione una ciudad...</option>
+                                    <option value="Arauca">Arauca</option>
+                                    <option value="Armenia">Armenia</option>
+                                    <option value="Barranquilla">Barranquilla</option>
+                                    <option value="Bogotá">Bogotá</option>
+                                    <option value="Bucaramanga">Bucaramanga</option>
+                                    <option value="Cali">Cali</option>
+                                    <option value="Cartagena">Cartagena</option>
+                                    <option value="Cúcuta">Cúcuta</option>
+                                    <option value="Florencia">Florencia</option>
+                                    <option value="Ibagué">Ibagué</option>
+                                    <option value="Inírida">Inírida</option>
+                                    <option value="Leticia">Leticia</option>
+                                    <option value="Manizales">Manizales</option>
+                                    <option value="Medellín">Medellín</option>
+                                    <option value="Mitú">Mitú</option>
+                                    <option value="Mocoa">Mocoa</option>
+                                    <option value="Montería">Montería</option>
+                                    <option value="Neiva">Neiva</option>
+                                    <option value="Pasto">Pasto</option>
+                                    <option value="Pereira">Pereira</option>
+                                    <option value="Popayán">Popayán</option>
+                                    <option value="Puerto Carreño">Puerto Carreño</option>
+                                    <option value="Quibdó">Quibdó</option>
+                                    <option value="Riohacha">Riohacha</option>
+                                    <option value="San Andrés">San Andrés</option>
+                                    <option value="San José del Guaviare">San José del Guaviare</option>
+                                    <option value="Santa Marta">Santa Marta</option>
+                                    <option value="Sincelejo">Sincelejo</option>
+                                    <option value="Tunja">Tunja</option>
+                                    <option value="Valledupar">Valledupar</option>
+                                    <option value="Villavicencio">Villavicencio</option>
+                                    <option value="Yopal">Yopal</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Tamaño de la Empresa:</label>
+                                <select name="tamano" class="form-select border-2" required>
+                                    <option value="" selected disabled>Seleccione una opción...</option>
+                                    <option value="Microempresa (1-10 emp)">Microempresa (1-10 empleados)</option>
+                                    <option value="Pequeña (11-50 emp)">Pequeña (11-50 empleados)</option>
+                                    <option value="Mediana (51-200 emp)">Mediana (51-200 empleados)</option>
+                                    <option value="Grande (+200 emp)">Grande (Más de 200 empleados)</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="legal-text mb-4 text-justify">
-                            <strong>Tratamiento de Datos:</strong> Al Diligenciar este instrumento, usted autoriza expresamente a la 
-                            <strong>Universidad Cooperativa de Colombia</strong> el tratamiento de sus datos con fines únicamente investigativos, 
-                            garantizando la confidencialidad y el manejo de los mismos bajo la Ley 1581 de 2012.
-                        </div>
-
-                        <button type="button" class="btn btn-primary btn-lg w-100 py-3 fw-bold" onclick="IMGS_Wizard.goToStep(1)">
+                        <button type="button" class="btn btn-primary btn-lg w-100 py-3 fw-bold shadow" 
+                                onclick="IMGS_Wizard.goToStep(1)">
                             Aceptar y Continuar
                         </button>
                     </div>
+
+                    <div class="step" id="step_intro">
+                    <div class="text-center mb-4">
+                        <h3 class="fw-bold text-primary">¡Bienvenido al Diagnóstico IMGS-T!</h3>
+                        <hr class="mx-auto" style="width: 50px; height: 3px; background: #0d6efd;">
+                    </div>
+
+                    <div class="p-4 bg-light rounded-4 shadow-sm mb-4 text-start">
+                        <p class="lead text-dark">Apreciado participante,</p>
+                        <p>Este instrumento nos permitirá recoger información de valor para generar un <strong>perfil de madurez en la gestión de la sostenibilidad</strong> en su organización.</p>
+                        
+                        <h6 class="fw-bold mt-4 mb-3"><i class="bi bi-info-circle-fill me-2"></i>¿Cómo funciona?</h6>
+                        <p>Responderá en aproximadamente <strong>40 minutos</strong>, preguntas sobre las siguientes dimensiones de su empresa:</p>
+                        
+                        <ul class="list-group list-group-flush bg-transparent">
+                            <li class="list-group-item bg-transparent"><i class="bi bi-check2-circle text-primary me-2"></i>Gobernanza y Gestión Estratégica</li>
+                            <li class="list-group-item bg-transparent"><i class="bi bi-check2-circle text-primary me-2"></i>Gestión Económica</li>
+                            <li class="list-group-item bg-transparent"><i class="bi bi-check2-circle text-primary me-2"></i>Gestión Social</li>
+                            <li class="list-group-item bg-transparent"><i class="bi bi-check2-circle text-primary me-2"></i>Gestión Ambiental</li>
+                            <li class="list-group-item bg-transparent"><i class="bi bi-check2-circle text-primary me-2"></i>Gestión Basada en Datos y Tecnología</li>
+                        </ul>
+                    </div>
+
+                    <div class="legal-text mb-4 text-justify shadow-sm border-start border-4 border-warning">
+                        <strong>Tratamiento de Datos:</strong> Al diligenciar este instrumento, usted autoriza expresamente a la 
+                        <strong>Universidad Cooperativa de Colombia</strong> el tratamiento de sus datos con fines únicamente investigativos, 
+                        garantizando la confidencialidad bajo la Ley 1581 de 2012. Puede contactarnos en: 
+                        <a href="mailto:laura.mancera@campusucc.edu.co" class="text-decoration-none">laura.mancera@campusucc.edu.co</a>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <button type="button" class="btn btn-light btn-lg flex-fill py-3" onclick="IMGS_Wizard.goToStep(0)">Atrás</button>
+                        <button type="button" class="btn btn-primary btn-lg flex-fill py-3 fw-bold shadow" onclick="IMGS_Wizard.startAssessment()">Comenzar Evaluación</button>
+                    </div>
+                </div>
 
                     {% for dim in dimensiones %}
                     <div class="step" id="step{{ loop.index }}">
