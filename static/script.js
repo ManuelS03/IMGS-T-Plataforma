@@ -186,3 +186,45 @@ function enviarComentario(empresaId) {
         btn.innerHTML = 'Enviar Sugerencia';
     });
 }
+
+function inicializarAyudasContextuales() {
+    document.querySelectorAll('.btn-ayuda').forEach(function (boton) {
+        boton.addEventListener('click', function () {
+            const explicacion = boton.dataset.ayudaExplicacion;
+            const ejemplo = boton.dataset.ayudaEjemplo;
+
+            const contenido = `
+                <div class="ayuda-contenido">
+                    <strong>¿Qué significa?</strong>
+                    <p>${escaparHTML(explicacion)}</p>
+                    <strong>Ejemplo textil</strong>
+                    <p>${escaparHTML(ejemplo)}</p>
+                </div>
+            `;
+
+            const existente = bootstrap.Popover.getInstance(boton);
+            if (existente) {
+                existente.dispose();
+            }
+
+            new bootstrap.Popover(boton, {
+                container: 'body',
+                trigger: 'focus',
+                placement: 'auto',
+                html: true,
+                title: 'Ayuda contextual',
+                content: contenido
+            }).show();
+        });
+    });
+}
+
+function escaparHTML(texto) {
+    const elemento = document.createElement('div');
+    elemento.textContent = texto;
+    return elemento.innerHTML;
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    inicializarAyudasContextuales();
+});
