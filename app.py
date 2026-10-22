@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from ayudas_imgs_t import AYUDAS
 
 app = Flask(__name__)
 load_dotenv()
@@ -31,7 +32,13 @@ def index():
     conn.close()
     # Obtenemos resultado de los argumentos de la URL si venimos de una redirección
     resultado = request.args.get('resultado') 
-    return render_template('index.html', dimensiones=dims, preguntas=pregs, resultado=None)
+    return render_template(
+        'index.html',
+        dimensiones=dims,
+        preguntas=pregs,
+        ayudas=AYUDAS,
+        resultado=None
+    )
 
 @app.route('/evaluar', methods=['POST'])
 def evaluar():
